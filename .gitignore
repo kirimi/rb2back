@@ -1,0 +1,6 @@
+.env
+/.idea/.gitignore
+/.idea/backend.iml
+/.idea/golinter.xml
+/.idea/misc.xml
+/.idea/modules.xml
