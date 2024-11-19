@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+option go_package = "user_service/";
+
+service UserService {
+  rpc GetUser (GetUserRequest) returns (UserConfigDto) {}
+  rpc DeleteUser (DeleteUserRequest) returns (DeleteUserResponse) {}
+}
+
+enum PremiumTypeDto {
+  FREE = 0;
+  LIFETIME = 1;
+  SUBSCRIPTION = 2;
+}
+
+message GetUserRequest {
+  string appVersion = 1;
+  string buildVersion = 2;
+  string deviceInfo = 3;
+  string locale = 4;
+  int64 createdAt = 5;
+  int64 lastSignInAt = 6;
+}
+
+message UserConfigDto {
+  bool isEnabled = 1;
+  PremiumTypeDto premiumType = 2;
+}
+
+message DeleteUserRequest {}
+
+message DeleteUserResponse {}
+
