@@ -1,7 +1,9 @@
 package db
 
 import (
+	"context"
 	"github.com/jmoiron/sqlx"
+	"github.com/pkg/errors"
 
 	_ "github.com/jackc/pgx/v4/stdlib" // for pgx driver
 	"time"
@@ -15,7 +17,7 @@ type Config interface {
 	GetConnMaxLifeTime() time.Duration
 }
 
-func ConnectDB(cfg Config) (*sqlx.DB, error) {
+func ConnectDB(ctx context.Context, cfg Config) (*sqlx.DB, error) {
 	db, err := sqlx.Open("pgx", cfg.GetDSN())
 	if err != nil {
 		return nil, err
@@ -24,6 +26,12 @@ func ConnectDB(cfg Config) (*sqlx.DB, error) {
 	db.SetMaxIdleConns(cfg.GetMaxIdleConns())
 	db.SetConnMaxIdleTime(cfg.GetConnMaxIdleTime())
 	db.SetConnMaxLifetime(cfg.GetConnMaxLifeTime())
+
+	err = db.PingContext(ctx)
+	if err != nil {
+		err = errors.Wrap(err, "db.PingContext()")
+		return nil, err
+	}
 
 	return db, nil
 }
