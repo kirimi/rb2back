@@ -5,6 +5,7 @@ go 1.23.1
 require (
 	github.com/kirimi/rb2backend/hello v0.0.0
 	github.com/labstack/echo v3.3.10+incompatible
+	gopkg.in/yaml.v3 v3.0.1
 )
 
 require (
