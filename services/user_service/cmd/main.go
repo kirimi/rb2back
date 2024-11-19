@@ -2,30 +2,27 @@ package main
 
 import (
 	"fmt"
+	"github.com/jmoiron/sqlx"
+	"github.com/kirimi/rb2backend/libs/db"
 	"github.com/kirimi/rb2backend/user_service/internal/config"
-	"github.com/labstack/echo"
-	"net/http"
-
-	"github.com/kirimi/rb2backend/hello"
+	"log"
 )
 
 func main() {
 	cfg := config.GetConfig("config.yaml")
 
-	dsn := fmt.Sprintf("host=%v port=%v user=%v password=%v dbname=%v sslmode=%v",
-		cfg.Database.Host,
-		cfg.Database.Port,
-		cfg.Database.User,
-		cfg.Database.Password,
-		cfg.Database.DBName,
-		cfg.Database.SslMode,
-	)
+	conn, err := db.ConnectDB(&cfg.DB)
+	if err != nil {
+		log.Panic(err)
+	}
+	defer func(conn *sqlx.DB) {
+		db.CloseDB(conn)
+	}(conn)
 
-	fmt.Println(dsn)
+	err = conn.Ping()
+	if err != nil {
+		log.Panic(err)
+	}
 
-	e := echo.New()
-	e.GET("/hello", func(c echo.Context) error {
-		return c.String(http.StatusOK, hello.Greet(dsn))
-	})
-	_ = e.Start(":8080")
+	fmt.Println("Connection to db established")
 }

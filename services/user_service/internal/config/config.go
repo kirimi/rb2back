@@ -5,23 +5,41 @@ import (
 	"gopkg.in/yaml.v3"
 	"os"
 	"path/filepath"
+	"time"
 )
 
 var cfg *Config
 
-type Database struct {
-	Host       string `yaml:"host"`
-	Port       int64  `yaml:"port"`
-	User       string `yaml:"user"`
-	Password   string `yaml:"password"`
-	Migrations string `yaml:"migrations"`
-	DBName     string `yaml:"dbname"`
-	SslMode    bool   `yaml:"sslmode"`
-	Driver     string `yaml:"driver"`
+type DB struct {
+	DSN             string        `yaml:"DSN"`
+	MaxOpenConns    int           `yaml:"maxOpenConns"`
+	MaxIdleConns    int           `yaml:"maxIdleConns"`
+	ConnMaxIdleTime time.Duration `yaml:"connMaxIdleTime"`
+	ConnMaxLifeTime time.Duration `yaml:"connMaxLifeTime"`
 }
 
 type Config struct {
-	Database Database `yaml:"database"`
+	DB DB `yaml:"db"`
+}
+
+func (d *DB) GetDSN() string {
+	return d.DSN
+}
+
+func (d *DB) GetMaxOpenConns() int {
+	return d.MaxOpenConns
+}
+
+func (d *DB) GetMaxIdleConns() int {
+	return d.MaxIdleConns
+}
+
+func (d *DB) GetConnMaxIdleTime() time.Duration {
+	return d.ConnMaxIdleTime
+}
+
+func (d *DB) GetConnMaxLifeTime() time.Duration {
+	return d.ConnMaxLifeTime
 }
 
 func GetConfig(yamlFilePath string) Config {
@@ -30,15 +48,12 @@ func GetConfig(yamlFilePath string) Config {
 	}
 
 	cfg := &Config{
-		Database: Database{
-			Host:       "localhost",
-			Port:       5432,
-			User:       "user",
-			Password:   "password",
-			DBName:     "postrgres",
-			SslMode:    false,
-			Migrations: "",
-			Driver:     "pgx",
+		DB: DB{
+			DSN:             "postgres://postgres:postrges@locahost:5432/db",
+			MaxOpenConns:    5,
+			MaxIdleConns:    5,
+			ConnMaxIdleTime: time.Minute * 5,
+			ConnMaxLifeTime: time.Minute * 5,
 		},
 	}
 
